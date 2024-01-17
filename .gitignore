@@ -1,0 +1,15 @@
+# Misc
+.DS_Store
+misc/
+paper/
+
+# Virtual environments
+env/
+venv/
+
+# Environment variables
+.env
+.env.local
+
+# Cache files
+__pycache__/

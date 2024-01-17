@@ -1,0 +1,7 @@
+numpy
+pandas
+python-dotenv
+llama-index
+llama-hub
+setuptools
+pypdf
