@@ -29,7 +29,7 @@ This project is a simple chatbot that uses the GPT-4 model to answer user querie
 ### Installation steps
 1. Clone the repository: `git clone https://github.com/Hashiraee/ChatAssignment.git`
 2. Setup virtual environment & install dependencies:
-- `cd chat_assignment`
+- `cd ChatAssignment`
 - `make install`
 - (Or `pip3 install -r requirements.txt`)
 
