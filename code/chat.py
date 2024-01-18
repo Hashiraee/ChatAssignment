@@ -2,13 +2,20 @@ import argparse
 import os
 
 from dotenv import load_dotenv
-from llama_index import ServiceContext, SimpleDirectoryReader, VectorStoreIndex
+from llama_index import (
+    ServiceContext,
+    SimpleDirectoryReader,
+    StorageContext,
+    VectorStoreIndex,
+    load_index_from_storage,
+)
 from llama_index.llms import OpenAI
 from prompts import refined_template, text_qa_template
 
 # Constants
 ENV_FILE = ".env.local"
 PAPERS_DIRECTORY = "./papers"
+PERSIST_DIRECTORY = "./storage"
 OUTPUT_DIRECTORY = "./output"
 MODEL_NAME = "gpt-4-1106-preview"
 TEMPERATURE = 0.2
@@ -36,22 +43,22 @@ def get_query_from_user():
     return args.query
 
 
-def get_reply(index, query_str, text_qa_template, refined_template):
+def get_reply(query_str, index, service_context):
     """
     This function uses the provided index to generate a response to the user's query. The response is generated
     using the text_qa_template and refined_template provided.
 
     Args:
-        index: The index to use for generating the response.
         query_str (str): The user's query.
-        text_qa_template (str): The template to use for generating the response.
-        refined_template (str): The template to use for refining the response.
+        index: The index to use for generating the response.
+        service_context: The service context to use for generating the response.
 
     Returns:
         response (str): The generated response to the user's query.
     """
     response = index.as_query_engine(
         streaming=True,
+        service_context=service_context,
         text_qa_template=text_qa_template,
         refine_template=refined_template,
     ).query(query_str)
@@ -59,11 +66,26 @@ def get_reply(index, query_str, text_qa_template, refined_template):
     return response
 
 
+def load_data():
+    """
+    Load the data from the papers directory and build the index.
+    """
+    if not os.path.exists(PERSIST_DIRECTORY):
+        documents = SimpleDirectoryReader(PAPERS_DIRECTORY).load_data()
+        index = VectorStoreIndex.from_documents(documents)
+        index.storage_context.persist(persist_dir=PERSIST_DIRECTORY)
+    else:
+        storage_context = StorageContext.from_defaults(persist_dir=PERSIST_DIRECTORY)
+        index = load_index_from_storage(storage_context)
+
+    return index
+
+
 def save_math_expression(response):
     """
     Extracts the mathematical expression from the response, writes it to a file, and prints the file location.
 
-    If the user want to run the code (after inspecting the code), they can run the following command:
+    If the user wants to run the code (after inspecting the code), they can run the following command:
     `make calculate`
 
     Args:
@@ -90,21 +112,17 @@ def main():
     load_environment_variables()
 
     # Creating a service context with default settings and OpenAI model
-    service_context = ServiceContext.from_defaults(
-        llm=OpenAI(model=MODEL_NAME, temperature=TEMPERATURE)
-    )
+    llm = OpenAI(model=MODEL_NAME, temperature=TEMPERATURE)
+    service_context = ServiceContext.from_defaults(llm=llm)
 
-    # Loading the recent (not part of training data) LLM related papers from arXiv
-    documents = SimpleDirectoryReader(PAPERS_DIRECTORY).load_data()
-
-    # Building the index
-    index = VectorStoreIndex.from_documents(documents, service_context=service_context)
+    # Load or build the index
+    index = load_data()
 
     # Getting the query from the user from the command-line
     query_str = get_query_from_user()
 
     # Querying the index and constructing the response
-    response = get_reply(index, query_str, text_qa_template, refined_template)
+    response = get_reply(query_str, index, service_context)
 
     # Steaming the response
     response.print_response_stream()
