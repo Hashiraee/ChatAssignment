@@ -67,6 +67,7 @@ The Vehicle Routing Problem (VRP) is a complex combinatorial optimization and in
 \`\`\`python
 
 result = (2843740 - 1000) / 367
+
 print(result)
 
 \`\`\`
