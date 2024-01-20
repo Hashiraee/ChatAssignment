@@ -7,8 +7,10 @@ help:
 	@echo " install     Create virtual environment (env) and install required packages"
 	@echo " freeze      Persist installed packages to requirements.txt"
 	@echo " clean       Remove *.pyc files and __pycache__ directory"
+	@echo " purge       Remove storage files"
 	@echo " envclean    Remove virtual environment (env)"
 	@echo " run         Run the code"
+	@echo " agent       Run the code with the agent"
 	@echo " calculate   Run the produced code"
 	@echo "Check the Makefile for more details"
 
@@ -22,6 +24,9 @@ freeze:
 clean:
 	@find . -name "*.pyc" -delete
 	@find . -name "__pycache__" -type d -exec rm -rf {} \+
+
+purge:
+	@rm -rf ./storage
 
 envclean: clean
 	@rm -rf $(VIRTUALENV)

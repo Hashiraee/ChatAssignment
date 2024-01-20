@@ -4,19 +4,22 @@ This project is a simple chatbot that uses the GPT-4 model to answer user querie
 ## Overview of the Project
 ```
 .
-├── .editorconfig           # File for editor configuration
-├── .env.local.example      # Example .env.local file for API Keys and Secrets
-├── .gitignore              
-├── Makefile                # Makefile for easy setup and installation
+├── .editorconfig               # File for editor configuration
+├── .env.local.example          # Example .env.local file for API Keys and Secrets
+├── .gitignore
+├── Makefile                    # Makefile for easy setup and installation 
 ├── README.md
-├── code                    # Folder containing the code files
-│   ├── chat.py
-│   └── prompts.py
-├── output                  # Output folder for expressions
-│   └── math_expression.py
-├── papers                  # Papers published after training cut-off date (arXiv)
+├── code                        # Folder containing the code files
+│   ├── agent.py                # Agent-based chat (documents, math, API, ...)
+│   ├── chat.py                 
+│   ├── fake_weather_api.py     # Fake weather API
+│   ├── math_functions.py       # Math functions as tools for the agent
+│   └── prompts.py              # Prompt(s) for the normal `chat.py` bot
+├── output                  
+│   └── math_expression.py      # Output folder for expressions 
+├── papers                      # Papers published after training cut-off date (arXiv)
 │   └── ...
-└── requirements.txt        # All requirements for this project
+└── requirements.txt            # All requirements for this project
 
 ```
 
@@ -33,7 +36,7 @@ This project is a simple chatbot that uses the GPT-4 model to answer user querie
 - `make install`
 - (Or `pip3 install -r requirements.txt`)
 
-## Usage
+## Usage (Normal Chat)
 1. Make sure you are in the root of the `ChatAssignment` directory
 2. Add either the `OPENAI_API_KEY` or `AZURE_OPENAI_API_KEY` to the `.env.local` file
 3. `make run "QUERY"`
@@ -42,8 +45,9 @@ This project is a simple chatbot that uses the GPT-4 model to answer user querie
 ### Example Usage (when the query is related to the LLM papers):
 **Input:** `python3 code/chat.py "Can you give a description of the different Gemini models"`
 
-**Output:** The Gemini family of models consists of three main sizes, each designed for different applications:
+**Output:**
 
+The Gemini family of models consists of three main sizes, each designed for different applications:
 1. **Ultra**: This is the most capable model in the Gemini family, delivering state-of-the-art performance across a wide range of highly complex tasks, including reasoning and multimodal tasks. It is optimized for efficient serving at scale on Google's Tensor Processing Units (TPUs) thanks to the Gemini architecture.
 
 2. **Pro**: ...
@@ -51,16 +55,18 @@ This project is a simple chatbot that uses the GPT-4 model to answer user querie
 ### Example Usage (not related to the papers in the `papers` directory):
 **Input:** `python3 code/chat.py "Can you give a concise description of the vehicle routing problem?"`
 
-**Output:** The Vehicle Routing Problem (VRP) is a complex combinatorial optimization and integer programming problem that seeks to deliver goods to various locations using a fleet of vehicles dispatched from a depot. The objective is to minimize the total route cost, which could include factors like distance, time, or fuel consumption, while satisfying constraints such as vehicle capacity, delivery time windows, and sometimes the requirement that each customer is visited exactly once. It is a generalization of the Traveling Salesman Problem (TSP), where instead of one route, multiple routes are constructed for the fleet of vehicles.
+**Output:** 
+
+The Vehicle Routing Problem (VRP) is a complex combinatorial optimization and integer programming problem that seeks to deliver goods to various locations using a fleet of vehicles dispatched from a depot. The objective is to minimize the total route cost, which could include factors like distance, time, or fuel consumption, while satisfying constraints such as vehicle capacity, delivery time windows, and sometimes the requirement that each customer is visited exactly once. It is a generalization of the Traveling Salesman Problem (TSP), where instead of one route, multiple routes are constructed for the fleet of vehicles.
 
 ### Example Usage (mathematical expressions):
 **Input:** `python3 code/chat.py "What is 2843740 divided by 367 after first subtracting 1000?"`
 
 **Output:**
+
 \`\`\`python
 
 result = (2843740 - 1000) / 367
-
 print(result)
 
 \`\`\`
@@ -72,3 +78,74 @@ Code written to ./output/math_expression.py
 After inspecting the code, we can run the code by issuing the following command:
 - `make calculate`
 - (Or `python3 output/math_expression.py`)
+
+
+## Usage (Agent Chat)
+1. Make sure you are in the root of the `ChatAssignment` directory
+2. Add either the `OPENAI_API_KEY` or `AZURE_OPENAI_API_KEY` to the `.env.local` file
+3. python3 code/agent.py "QUERY"`
+
+### Example Usage (when the query is related to the LLM papers):
+**Input:** `python3 code/agent.py "Can you give a description of the TPU's used to train Gemini?"`
+
+**Output (verbose=False):**
+The Gemini models were trained on Google's TPUv5e and TPUv4 accelerators. The TPUv4 accelerators are organized into large configurations called "SuperPods," each containing 4096 chips. These SuperPods feature a dedicated optical switch that allows for the dynamic reconfiguration of the chips into various 3D torus topologies, a process that can be completed in about 10 seconds.
+
+For the training of Gemini Ultra, a substantial number of TPUv4 accelerators were utilized across multiple data centers. The TPUs communicate with each other using a high-speed inter-chip-interconnect, and for operations on the scale of Gemini Ultra, SuperPods from different data centers are connected through Google’s advanced intra-cluster and inter-cluster networking infrastructure.⏎ 
+
+### Example Usage (not related to the papers in the `papers` directory):
+**Input:** `python3 code/agent.py "Can you tell me something about Nvidia's H100?"`
+
+**Output (verbose=False):** 
+Added user message to memory: Can you tell me something about Nvidia's H100?
+NVIDIA's H100, also known as Hopper H100, is a data center GPU based on the Hopper architecture, which is named after the American computer scientist Grace Hopper. It is designed to accelerate a wide range of computing workloads, including artificial intelligence (AI), high-performance computing (HPC), and graphics.
+
+Here are some key features and aspects of the NVIDIA H100:
+
+1. **Architecture**: The H100 is built on the Hopper architecture, which introduces several new technologies and improvements over the previous Ampere architecture.
+
+2. **Transistors and Process**: The H100 is manufactured using a cutting-edge semiconductor process, which allows for a large number of transistors to be packed into the chip, enhancing its performance and energy efficiency.
+
+3. ...
+
+
+### Example Usage (mathematical expressions):
+**Input:** `python3 code/agent.py "What is 2843740 divided by 367 after first subtracting 1000 and then finally taking the 
+square root?"`
+
+**Output (verbose=True):**
+Added user message to memory: What is 2843740 divided by 367 after first subtracting 1000 and then finally taking the square root?
+=== Calling Function ===
+Calling function: subtract with args: {"a": 2843740, "b": 1000}
+Got output: 2842740
+========================
+
+=== Calling Function ===
+Calling function: divide with args: {"a":2842740,"b":367}
+Got output: 7745.89
+========================
+
+=== Calling Function ===
+Calling function: square_root with args: {"a":7745.89}
+Got output: 88.0107379812259
+========================
+
+After subtracting 1000 from 2843740, dividing the result by 367, and then taking the square root, the final result is approximately 88.01.
+
+
+### Example Usage ("Fake" weather API usage):
+**Input:** `python3 code/agent.py "What is the weather like in Rotterdam and Zoetermeer?"`
+
+**Output (verbose=True):**
+Added user message to memory: What is the weather like in Rotterdam and Zoetermeer?
+=== Calling Function ===
+Calling function: get_current_weather with args: {"location": "Rotterdam", "unit": "celsius"}
+Got output: {"location": "Rotterdam", "temperature": "1", "unit": "celsius"}
+========================
+
+=== Calling Function ===
+Calling function: get_current_weather with args: {"location": "Zoetermeer", "unit": "celsius"}
+Got output: {"location": "Zoetermeer", "temperature": "3", "unit": "celsius"}
+========================
+
+The current weather in Rotterdam is 1°C, and in Zoetermeer, it is 3°C.
