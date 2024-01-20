@@ -114,6 +114,7 @@ Here are some key features and aspects of the NVIDIA H100:
 square root?"`
 
 **Output (verbose=True):**
+```
 Added user message to memory: What is 2843740 divided by 367 after first subtracting 1000 and then finally taking the square root?
 === Calling Function ===
 Calling function: subtract with args: {"a": 2843740, "b": 1000}
@@ -131,12 +132,13 @@ Got output: 88.0107379812259
 ========================
 
 After subtracting 1000 from 2843740, dividing the result by 367, and then taking the square root, the final result is approximately 88.01.
-
+```
 
 ### Example Usage ("Fake" weather API usage):
 **Input:** `python3 code/agent.py "What is the weather like in Rotterdam and Zoetermeer?"`
 
 **Output (verbose=True):**
+```
 Added user message to memory: What is the weather like in Rotterdam and Zoetermeer?
 === Calling Function ===
 Calling function: get_current_weather with args: {"location": "Rotterdam", "unit": "celsius"}
@@ -149,3 +151,4 @@ Got output: {"location": "Zoetermeer", "temperature": "3", "unit": "celsius"}
 ========================
 
 The current weather in Rotterdam is 1°C, and in Zoetermeer, it is 3°C.
+```
